@@ -1,0 +1,27 @@
+{
+  "name": "noita-winstreak-updater",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npx vite",
+    "build": "npx tsc && npx vite build",
+    "preview": "npx vite preview",
+    "tauri": "tauri",
+    "format": "npx @biomejs/biome format --write ./src",
+    "lint": "biome check --apply ./src"
+  },
+  "dependencies": {
+    "@fluentui/web-components": "^2.6.1",
+    "@tauri-apps/api": "^1",
+    "@techstark/opencv-js": "^4.9.0-release.3",
+    "tauri-plugin-fs-watch-api": "github:tauri-apps/tauri-plugin-fs-watch#v1",
+    "tesseract.js": "^5.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.7.3",
+    "@tauri-apps/cli": "^1",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  }
+}

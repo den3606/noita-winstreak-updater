@@ -1,0 +1,142 @@
+import { createWorker } from 'tesseract.js';
+import cv from '@techstark/opencv-js';
+
+// TODO: 画面キャプチャの範囲を正しく取れるようにする
+// TODO: 画像をリサイズして、Noitaのでかい文字だけが取れるようにする
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const captureStart = document.querySelector('#captureStart');
+
+  captureStart?.addEventListener('click', async () => {
+    const mediaStream: MediaStream = await startCapture();
+
+    const videoElement = document.createElement('video');
+    videoElement.srcObject = mediaStream;
+    videoElement.play();
+    videoElement.addEventListener('loadedmetadata', async () => {
+      console.group('metadata読み込み後');
+      console.log('幅:', videoElement.videoWidth);
+      console.log('高さ:', videoElement.videoHeight);
+      console.groupEnd();
+
+      // ビデオフレームをキャプチャするためのCanvasを作成
+      const offscreenCanvas = document.createElement('canvas');
+      // const offscreenCanvas =
+      //   document.querySelector<HTMLCanvasElement>('#canvas')!;
+      offscreenCanvas.height = videoElement.videoHeight;
+      offscreenCanvas.width = videoElement.videoWidth;
+      const ctx = offscreenCanvas.getContext('2d');
+
+      // ビデオからフレームをCanvasに描画
+      ctx?.drawImage(
+        videoElement,
+        0,
+        0,
+        videoElement.videoWidth,
+        videoElement.videoHeight
+      );
+
+      const templateCanvas = document.createElement('canvas');
+      const tctx = templateCanvas.getContext('2d');
+      const image = new Image();
+      image.src = 'http://127.0.0.1:1420/game_over.png';
+      await new Promise<void>((resolve) => {
+        image.addEventListener('load', () => {
+          resolve();
+        });
+      });
+      templateCanvas.height = image.height;
+      templateCanvas.width = image.width;
+      tctx?.drawImage(image, 0, 0, image.width, image.height);
+      const templateMat = cv.imread(templateCanvas);
+
+      const srcMat = cv.imread(offscreenCanvas);
+      let dst = new cv.Mat();
+      let mask = new cv.Mat();
+
+      const deleteMats = (...mats: any) =>
+        mats.forEach((mat: any) => mat.delete());
+
+      try {
+        cv.matchTemplate(srcMat, templateMat, dst, cv.TM_CCOEFF_NORMED, mask);
+      } catch (e) {
+        console.error(
+          'opencvの比較でエラーが発生しました。判定をスキップします。'
+        );
+        console.error(e);
+        deleteMats(dst, mask, templateMat, srcMat);
+      }
+
+      // スコアが閾値以上の座標をすべて取得
+      const threshold = 0.8; // 類似度の閾値
+      let matches = [];
+      for (let i = 0; i < dst.rows; i++) {
+        for (let j = 0; j < dst.cols; j++) {
+          let score = dst.data32F[i * dst.cols + j]; // 正確なスコア取得
+          // if (score > threshold) {
+          matches.push({ score: score * 100, x: j, y: i }); // スコアをパーセンテージで格納
+          // }
+        }
+      }
+
+      // 類似度スコアで降順にソート
+      matches.sort((a, b) => b.score - a.score);
+      matches = matches.slice(0, 9);
+      // 結果の座標をコンソールに出力
+      matches.forEach((match) => {
+        console.log(
+          `Score: ${match.score.toFixed(2)}%, X: ${match.x}, Y: ${match.y}`
+        );
+      });
+
+      deleteMats(dst, mask, templateMat, srcMat);
+
+      // // Tesseract.jsのワーカーを作成
+      // const worker = await createWorker('eng');
+      // // Canvasから画像データを取得してOCR実行
+      // const {
+      //   data: { text },
+      // } = await worker.recognize(offscreenCanvas);
+
+      // // 結果を表示
+      // console.log('-------------------');
+      // console.log(`imgname: canvas`);
+      // console.log('-------------------');
+      // console.log(text);
+
+      // [
+      //   'http://127.0.0.1:1420/gg2.jpg',
+      //   'http://127.0.0.1:1420/dead.png',
+      //   'http://127.0.0.1:1420/dead2.jpg',
+      // ].forEach(async (img) => {
+      //   // Tesseract.jsのワーカーを作成
+      //   const worker = await createWorker('eng');
+      //   // Canvasから画像データを取得してOCR実行
+      //   const {
+      //     data: { text },
+      //   } = await worker.recognize(img);
+
+      //   // 結果を表示
+      //   console.log('-------------------');
+      //   console.log(`imgname: ${img}`);
+      //   console.log('-------------------');
+      //   console.log(text);
+      // });
+    });
+  });
+});
+
+async function startCapture(
+  displayMediaOptions?: DisplayMediaStreamOptions
+): Promise<MediaStream> {
+  let captureStream = null;
+
+  try {
+    captureStream = await navigator.mediaDevices.getDisplayMedia(
+      displayMediaOptions
+    );
+  } catch (err) {
+    throw new Error('can not get display media');
+  }
+  return captureStream;
+}

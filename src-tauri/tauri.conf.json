@@ -1,0 +1,46 @@
+{
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "noita-winstreak-updater",
+    "version": "0.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true,
+      "shell": {
+        "all": false,
+        "open": true
+      }
+    },
+    "windows": [
+      {
+        "title": "noita-winstreak-updater",
+        "width": 700,
+        "height": 500,
+        "fullscreen": false,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "dev.den3606.noita-winstreak-updater",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    }
+  }
+}
