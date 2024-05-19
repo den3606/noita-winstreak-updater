@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 import type { MonitorStatus } from "../interfaces/monitor-status";
-import type { StartButtonParams } from "../interfaces/start-button-params";
+import type { StartButtonParams } from "../interfaces";
 
 const click = async (event: Event, { monitorStatus, template, filePath }: StartButtonParams) => {
   event.preventDefault();

@@ -16,13 +16,20 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "fs": {
+        "scope": ["**"]
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["**"]
       }
     },
     "windows": [
       {
         "title": "noita-winstreak-updater",
-        "width": 700,
-        "height": 500,
+        "width": 475,
+        "height": 250,
         "fullscreen": false,
         "resizable": true
       }
