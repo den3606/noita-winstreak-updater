@@ -1,6 +1,7 @@
 const fromHexString = (hexString: string): Uint8Array => {
   try {
-    return new Uint8Array(hexString.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
+    const byteArray = hexString.match(/.{1,2}/g) ?? [];
+    return new Uint8Array(byteArray.map((byte) => Number.parseInt(byte, 16)));
   } catch (e) {
     throw new Error("key or iv are invalid");
   }

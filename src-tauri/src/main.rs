@@ -132,12 +132,19 @@ fn add_win_streak(file_path: &str, template: &str, change: u32) -> io::Result<()
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
 
-    // FIXME: おそらくうまく取れていないので、0でreturnしている
     let mut win_streak: u32 = extract_win_streak_from(template, &contents).unwrap_or(0);
+    println!("extracted winstrek count: {}", win_streak);
     win_streak += change;
-    let text = generate_text_from(template, win_streak);
 
-    println!("winstreak text is {}", text);
+    let text = match generate_text_from(template, win_streak) {
+        Ok(text) => text,
+        Err(error_message) => {
+            eprintln!("{}", error_message);
+            return Ok(());
+        }
+    };
+
+    println!("{}", text);
 
     // ファイルを再度書き込みモードで開く（内容をクリア）
     let mut file = OpenOptions::new()
@@ -153,19 +160,23 @@ fn add_win_streak(file_path: &str, template: &str, change: u32) -> io::Result<()
 fn reset_win_streak(file_path: &str, template: &str) -> io::Result<()> {
     let mut file = OpenOptions::new().write(true).open(file_path)?;
     file.set_len(0)?;
-    let text = generate_text_from(template, 0);
-    file.write_all(text.as_bytes())?;
+
+    match generate_text_from(template, 0) {
+        Ok(text) => file.write_all(text.as_bytes())?,
+        Err(error_message) => eprintln!("{}", error_message),
+    }
+
     println!("Win streak reset to: 0");
     Ok(())
 }
 
-fn generate_text_from(template: &str, win_streak: u32) -> String {
+fn generate_text_from(template: &str, win_streak: u32) -> Result<String, String> {
     let mut context = Context::new();
-    context.insert("winStreak", &win_streak);
-
-    let text = Tera::one_off(template, &context, false).unwrap();
-
-    text
+    context.insert("win_streak", &win_streak);
+    match Tera::one_off(template, &context, false) {
+        Ok(text) => Ok(text),
+        Err(_) => Err(String::from("can not parse from text")),
+    }
 }
 
 fn extract_win_streak_from(template: &str, s: &str) -> Result<u32, String> {
@@ -176,7 +187,7 @@ fn extract_win_streak_from(template: &str, s: &str) -> Result<u32, String> {
 
     // テンプレート中の`{{winstreak}}`を正規表現パターンに変換
     let escaped_template = escape_regex(template);
-    let pattern = escaped_template.replace(r"\{\{winstreak\}\}", r"(\d+)");
+    let pattern = escaped_template.replace(r"\{\{win_streak\}\}", r"(\d+)");
 
     // 正規表現を作成
     let re = Regex::new(&pattern).map_err(|e| e.to_string())?;
@@ -184,6 +195,7 @@ fn extract_win_streak_from(template: &str, s: &str) -> Result<u32, String> {
     // マッチを探す
     if let Some(captures) = re.captures(s) {
         if let Some(matched) = captures.get(1) {
+            eprintln!("matched number: {}", matched.as_str());
             return matched.as_str().parse::<u32>().map_err(|e| e.to_string());
         }
     }

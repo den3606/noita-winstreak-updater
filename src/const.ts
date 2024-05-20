@@ -1,3 +1,3 @@
 export const NOITA_WINSTREAK_UPDATER = {
-  SETTINGS_FILE: 'settings.json'
+  SETTINGS_FILE: "settings.json",
 } as const;

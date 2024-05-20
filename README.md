@@ -1,7 +1,11 @@
-# Tauri + Vanilla TS
+# Noita Winstreak Updater
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Typescript.
+指定したテキストファイルに WinStreak を刻みます。  
+メモリを参照しているので、MOD を利用せずにストリークの自動更新ができます。  
+Epilogue2 の `noita.exe`のみ動作可能です。
 
-## Recommended IDE Setup
+# TODO
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- 個別のファイル参照（Normal/Nightmare）等を変更してカウントする
+- noita.exe のプロセスを常時探索
+- 権限の整理

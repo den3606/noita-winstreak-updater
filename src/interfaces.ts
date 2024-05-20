@@ -1,6 +1,6 @@
 export interface StartButtonParams {
   monitorStatus: HTMLParagraphElement;
-  template: string;
+  templateText: HTMLTextAreaElement;
   filePath: string;
 }
 export type MonitorStatus = "close" | "timeout" | "undefined";

@@ -1,7 +1,6 @@
 import { dialog } from "@tauri-apps/api";
-import { OpenDialogOptions, SaveDialogOptions } from "@tauri-apps/api/dialog";
-import { readBinaryFile, readTextFile, writeTextFile, BaseDirectory } from "@tauri-apps/api/fs";
-import { NOITA_WINSTREAK_UPDATER } from "./const";
+import type { OpenDialogOptions } from "@tauri-apps/api/dialog";
+import { BaseDirectory, readBinaryFile, readTextFile, writeTextFile } from "@tauri-apps/api/fs";
 
 export interface FileItem {
   filePath: string;

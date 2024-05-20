@@ -1,5 +1,5 @@
 import { NOITA_WINSTREAK_UPDATER } from "../const";
-import { loadJsonFile, saveJsonFile, saveTextFile, selectTargetFile } from "../file";
+import { loadJsonFile, saveJsonFile, selectTargetFile } from "../file";
 import type { Settings } from "../interfaces";
 
 const click = async (event: Event) => {
